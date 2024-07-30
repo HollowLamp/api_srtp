@@ -30,7 +30,7 @@ app.use(cors());
 //返回....，前端组织URL在82行，正常标志应该是选择好前3个后，点击查询显示区域内所有地块的相应值
 //app.get('/query/:city/:station/:polygon/block/:property', getPropertyOfAllBlockInPolygon);
 
-//vue代码在/frontend/src/componets下，可能有错，如果发现问题或验证的时候有问题及时提醒我
+//vue代码在/frontend/src/下，可能有错，如果发现问题或验证的时候有问题及时提醒我
 
 //测试用，直接获取所有地块名字在加载时载入网页，效果与第一个api相同，为了减少卡顿，限制25个
 const test_getAllBlock = async (req, res) => {
