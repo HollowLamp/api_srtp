@@ -97,7 +97,7 @@ const getPropertyOfAllBlockInPolygon = async (req, res) => {
 
 app.get('/query/:city/:station/:polygon/block/:property', getPropertyOfAllBlockInPolygon);
 
-//返回指定站点下的指定轮廓下的指定地块的指定属性，属性的可选值在vue文件里的数组中定义，前端组织URL在80行，正常标志应该是选择好4个后，点击查询显示相应值
+//返回指定站点下的指定轮廓下的指定地块的指定属性
 const getPropertyOfBlockInPolygon = async (req, res) => {
   const { station, polygon, block, property } = req.params;
 
