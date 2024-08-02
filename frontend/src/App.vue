@@ -23,9 +23,7 @@
       </option>
     </select>
 
-
     <button @click="fetchData">查询</button>
-
 
     <pre>{{ result }}</pre>
   </div>
@@ -47,7 +45,6 @@ export default {
     const result = ref('');
     const serverUrl = ref('http://localhost:3001');
 
-
     const test_allBlock = ref([]);
     const test_fetchAllBlocks = async () => {
       const response = await axios.get(`${serverUrl.value}/query/city/block`);
@@ -55,25 +52,36 @@ export default {
       blocks.value = test_allBlock.value;
     };
 
-    // eslint-disable-next-line no-unused-vars
     const fetchStations = async () => {
       const response = await axios.get(`${serverUrl.value}/query/city/station`);
       stations.value = response.data;
     };
 
-    // eslint-disable-next-line no-unused-vars
     const fetchBlocksInIsochrone = async () => {
-      const response = await axios.get(`${serverUrl.value}/query/city/${selectedStation.value}/block`);
+      console.log('Selected Polygon:', selectedPolygon.value);
+      let Iso;
+      if (selectedPolygon.value == 5) {
+        Iso = `${selectedStation.value}_5`;
+      } else {
+        Iso = `${selectedStation.value}_10`;
+      }
+      const response = await axios.get(`${serverUrl.value}/query/city/${selectedStation.value}/${Iso}/block`);
       blocks.value = response.data;
     };
+
 
     const fetchData = async () => {
       if (!selectedStation.value || !selectedPolygon.value) {
         result.value = '请至少选择站点和等时圈轮廓。';
         return;
       }
-
-      let url = `${serverUrl.value}/query/city/${selectedStation.value}/${selectedPolygon.value}`;
+      let Iso;
+      if (selectedPolygon.value == 5) {
+        Iso = `${selectedStation.value}_5`;
+      } else {
+        Iso = `${selectedStation.value}_10`;
+      }
+      let url = `${serverUrl.value}/query/city/${selectedStation.value}/${Iso}`;
 
       if (selectedProperty.value && selectedBlock.value) {
         url += `/${selectedBlock.value}/${selectedProperty.value}`;
@@ -89,11 +97,11 @@ export default {
       }
     };
 
-
     onMounted(() => {
-      //fetchStations();
+      fetchStations();
       test_fetchAllBlocks();
     });
+
     return {
       stations,
       selectedStation,
@@ -103,8 +111,10 @@ export default {
       blocks,
       selectedBlock,
       result,
-      fetchData
+      fetchData,
+      fetchBlocksInIsochrone
     };
   }
 };
 </script>
+
