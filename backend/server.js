@@ -6,7 +6,7 @@ import neo4j from 'neo4j-driver';
 
 const app = express();
 const PORT = 3001;
-const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', '12345678'));
+const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', 'srtp'));
 
 
 
@@ -16,9 +16,9 @@ app.use(cors());
 
 
 //返回所有站点名称，城市可以忽略，目前只有南京
-const getAllStation = async(req, res) => {
+const getAllStation = async (req, res) => {
   const session = driver.session();
-  try{
+  try {
     const result = await session.run('MATCH (s:station) return s.nodeId');
     const stationNames = result.records.map(record => record.get(0));
     res.send(stationNames);
@@ -33,10 +33,10 @@ const getAllStation = async(req, res) => {
 app.get('/query/:city/station', getAllStation);
 
 //返回指定站点名称的制定等时圈的轮廓属性
-const getPolyonOfStation = async(req, res) => {
+const getPolyonOfStation = async (req, res) => {
   const { station, polygon } = req.params;
   const session = driver.session();
-  try{
+  try {
     const result = await session.run(`
       MATCH (s:station {nodeId: $station})-[:containIso]->(p:staion_isochrone {nodeId: $polygon})
       RETURN p.location as location
@@ -76,7 +76,6 @@ app.get('/query/:city/:station/:polygon/block/', getBlockInPolygon);
 
 //返回返回指定站点下的指定轮廓下的所有地块的指定属性
 const getPropertyOfAllBlockInPolygon = async (req, res) => {
-  console.log('2');
   const { station, polygon, property } = req.params;
 
   const session = driver.session();
@@ -100,7 +99,6 @@ app.get('/query/:city/:station/:polygon/block/:property', getPropertyOfAllBlockI
 
 //返回指定站点下的指定轮廓下的指定地块的指定属性，属性的可选值在vue文件里的数组中定义，前端组织URL在80行，正常标志应该是选择好4个后，点击查询显示相应值
 const getPropertyOfBlockInPolygon = async (req, res) => {
-  console.log('1');
   const { station, polygon, block, property } = req.params;
 
   const session = driver.session();
