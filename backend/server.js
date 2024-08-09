@@ -1,4 +1,3 @@
-
 import express from 'express';
 import cors from 'cors';
 import neo4j from 'neo4j-driver';
@@ -6,12 +5,11 @@ import neo4j from 'neo4j-driver';
 
 const app = express();
 const PORT = 3001;
-const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', 'srtp'));
+const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', '12345678'));
 
 
 
 app.use(cors());
-
 
 
 
@@ -38,7 +36,7 @@ const getPolyonOfStation = async (req, res) => {
   const session = driver.session();
   try {
     const result = await session.run(`
-      MATCH (s:station {nodeId: $station})-[:containIso]->(p:staion_isochrone {nodeId: $polygon})
+      MATCH (s:station {nodeId: $station})-[:haveIso]->(p:staion_isochrone {nodeId: $polygon})
       RETURN p.location as location
     `, { station, polygon });
     const location = result.records.map(record => record.get(0));
@@ -59,7 +57,7 @@ const getBlockInPolygon = async (req, res) => {
   const session = driver.session();
   try {
     const result = await session.run(`
-      MATCH (s:station {nodeId: $station})-[:containIso]->(p:staion_isochrone {nodeId: $polygon})-[:intersectingBlocks]->(b:block)
+      MATCH (s:station {nodeId: $station})-[:haveIso]->(p:staion_isochrone {nodeId: $polygon})-[:includeBlock]->(b:block)
       RETURN b.nodeId as blockName
     `, { station, polygon });
     const blockNames = result.records.map(record => record.get('blockName'));
@@ -81,7 +79,7 @@ const getPropertyOfAllBlockInPolygon = async (req, res) => {
   const session = driver.session();
   try {
     const result = await session.run(`
-      MATCH (s:station {nodeId: $station})-[:containIso]->(p:staion_isochrone {nodeId: $polygon})-[:intersectingBlocks]->(b:block)
+      MATCH (s:station {nodeId: $station})-[:haveIso]->(p:staion_isochrone {nodeId: $polygon})-[:includeBlock]->(b:block)
       RETURN b[$property] as propertyValue
     `, { station, polygon, property });
     const propertyValues = result.records.map(record => record.get('propertyValue'));
@@ -104,7 +102,7 @@ const getPropertyOfBlockInPolygon = async (req, res) => {
   const session = driver.session();
   try {
     const result = await session.run(`
-      MATCH (s:station {nodeId: $station})-[:containIso]->(p:staion_isochrone {nodeId: $polygon})-[:intersectingBlocks]->(b:block {nodeId: $block})
+      MATCH (s:station {nodeId: $station})-[:haveIso]->(p:staion_isochrone {nodeId: $polygon})-[:includeBlock]->(b:block {nodeId: $block})
       RETURN b[$property] as propertyValue
     `, { station, polygon, block, property });
     const propertyValue = result.records.map(record => record.get('propertyValue'));
